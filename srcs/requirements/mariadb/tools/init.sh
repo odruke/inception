@@ -1,25 +1,39 @@
 #!/bin/bash
+set -e
 
+DATA_DIR=/var/lib/mysql
+SOCKET=/run/mysqld/mysqld.sock
 
-if [ ! -f dbcreated.flag ]; then
-	exec mysqld_safe
+mkdir -p /run/mysqld
+chown -R mysql:mysql /run/mysqld "$DATA_DIR"
 
-	while ! mysqladmin ping --silent; do
-		sleep 1
-	done
-	echo "editing ip from 50-server.cnf"
-	sed -i 's/127.0.0.1/0.0.0.0/' /etc/mysql/mariadb.conf.d/50-server.cnf
+# Allow external connections (applies to the final startup)
+sed -i 's/127.0.0.1/0.0.0.0/' /etc/mysql/mariadb.conf.d/50-server.cnf
 
-	echo "Database does not exists, creating database: ${DB_NAME}"
-	mysql -e "CREATE DATABASE IF NOT EXISTS ${DB_NAME};"
-	mysql -e "CREATE USER IF NOT EXISTS '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASSWORD}';"
-	mysql -e "GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'%';"
-	mysql -e "FLUSH PRIVILEGES;"
-
-	touch dbcreated.flag
-	# mysqladmin shutdown
-
-else
-	echo "Database already exists, launching mysqld_safe"
-	exec mysqld_safe
+# Initialize base system tables if this is a fresh volume.
+if [ ! -d "$DATA_DIR/mysql" ]; then
+  echo "Initializing MariaDB data directory..."
+  mariadb-install-db --user=mysql --datadir="$DATA_DIR"
 fi
+
+# Use the database folder as the proof of configuration.
+if [ ! -d "$DATA_DIR/$DB_NAME" ]; then
+  echo "Configuring initial database and user..."
+  mysqld_safe --skip-networking --socket="$SOCKET" &
+  TMP_PID=$!
+
+  until mysqladmin --socket="$SOCKET" ping --silent; do
+    sleep 1
+  done
+
+  mysql --socket="$SOCKET" -e "CREATE DATABASE IF NOT EXISTS ${DB_NAME};"
+  mysql --socket="$SOCKET" -e "CREATE USER IF NOT EXISTS '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASSWORD}';"
+  mysql --socket="$SOCKET" -e "GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'%';"
+  mysql --socket="$SOCKET" -e "FLUSH PRIVILEGES;"
+
+  mysqladmin --socket="$SOCKET" shutdown
+  wait "$TMP_PID"
+fi
+
+echo "Starting MariaDB..."
+exec mysqld_safe
