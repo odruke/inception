@@ -1,7 +1,7 @@
 FROM debian:bookworm
 
 RUN apt-get update && apt-get install -y \
-    curl wget gnupg2 ca-certificates \
+    curl wget gnupg2 ca-certificates mariadb-client\
     php php-cli php-fpm php-mysql \
     php-curl php-xml php-mbstring php-zip unzip \
     vim \

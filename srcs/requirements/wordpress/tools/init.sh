@@ -11,10 +11,14 @@ if [ ! -f /var/www/html/wp-config.php ]; then
   chown www-data:www-data /var/www/html
   cd /var/www/html
 
-  curl -O https://wordpress.org/latest.tar.gz
-  tar -xzf latest.tar.gz
-  mv wordpress/* .
-  rm -rf wordpress latest.tar.gz
+  tmpdir=$(mktemp -d)
+  curl -o "$tmpdir/latest.tar.gz" https://wordpress.org/latest.tar.gz
+  tar -xzf "$tmpdir/latest.tar.gz" -C "$tmpdir"
+  # copy contents into target, merging with existing directories
+  shopt -s dotglob
+  cp -a "$tmpdir/wordpress/." /var/www/html/
+  shopt -u dotglob
+  rm -rf "$tmpdir"
 
   if command -v wp >/dev/null 2>&1; then
     wp config create \
