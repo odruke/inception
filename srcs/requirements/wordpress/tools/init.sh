@@ -50,4 +50,4 @@ EOF
   chown -R www-data:www-data /var/www/html
 fi
 
-exec php-fpm -F
+exec php-fpm8.2 -F
