@@ -19,4 +19,4 @@ RUN chmod +x /init.sh
 
 EXPOSE 9000
 
-CMD ["/init.sh"]
+ENTRYPOINT ["/init.sh"]

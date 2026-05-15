@@ -7,6 +7,9 @@ until mysqladmin ping -h mariadb --silent; do
 done
 
 if [ ! -f /var/www/html/wp-config.php ]; then
+
+  echo "wordpress not installed, downloading and installing..."
+
   mkdir -p /var/www/html
   chown www-data:www-data /var/www/html
   cd /var/www/html
@@ -21,6 +24,7 @@ if [ ! -f /var/www/html/wp-config.php ]; then
   rm -rf "$tmpdir"
 
   if command -v wp >/dev/null 2>&1; then
+    echo "configuring wordpress database..."
     wp config create \
     --allow-root \
     --dbname="$DB_NAME" \
@@ -49,5 +53,7 @@ EOF
 
   chown -R www-data:www-data /var/www/html
 fi
+
+echo "launching php-fpm"
 
 exec php-fpm8.2 -F
