@@ -5,8 +5,8 @@ services:
     volumes:
       - mariadbvol:/var/lib/mysql/
     restart: always
-    ports:
-      - "3306:3306"
+    expose:
+      - "3306"
     env_file:
       - .env
     networks:
@@ -20,8 +20,8 @@ services:
     volumes:
       - wordpressvol:/var/www/html/
     restart: always
-    ports:
-      - "9000:9000"
+    expose:
+      - "9000"
     env_file:
       - .env
     networks:
@@ -33,7 +33,6 @@ services:
     depends_on:
       - wordpress
     ports:
-      - "80:80"
       - "443:443"
     volumes:
       - wordpressvol:/var/www/html:ro

@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y \
   && apt-get clean
 
 COPY tools/.vimrc /root/.vimrc
-COPY tools/www.conf /etc/php/8.2/fpm/pool.d/www.conf
+COPY conf/www.conf /etc/php/8.2/fpm/pool.d/www.conf
 
 # Install WP-CLI
 RUN curl -L https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar -o /usr/local/bin/wp \

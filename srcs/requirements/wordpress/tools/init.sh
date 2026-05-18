@@ -2,6 +2,7 @@
 set -e
 
 # wait for mariadb
+
 until mysqladmin ping -h mariadb --silent; do
   sleep 1
 done
@@ -23,7 +24,6 @@ if [ ! -f /var/www/html/wp-config.php ]; then
   shopt -u dotglob
   rm -rf "$tmpdir"
 
-  if command -v wp >/dev/null 2>&1; then
     echo "configuring wordpress database..."
     wp config create \
     --allow-root \
@@ -32,24 +32,14 @@ if [ ! -f /var/www/html/wp-config.php ]; then
     --dbpass="$DB_PASSWORD" \
     --dbhost="mariadb"
 
-    wp core install \
-    --allow-root \
-    --url="$DOMAIN_NAME" \
-    --title="$WP_TITLE" \
-    --admin_user="$WP_USER" \
-    --admin_password="$WP_USER_PASSWORD" \
-    --admin_email="$WP_USER_EMAIL"
-  else
-    cat > wp-config.php <<EOF
-<?php
-define('DB_NAME', '$DB_NAME');
-define('DB_USER', '$DB_USER');
-define('DB_PASSWORD', '$DB_PASSWORD');
-define('DB_HOST', 'mariadb');
-define('DB_CHARSET', 'utf8');
-define('DB_COLLATE', '');
-EOF
-  fi
+    # wp core install \
+    # --allow-root \
+    # --url="$DOMAIN_NAME" \
+    # --title="$WP_TITLE" \
+    # --admin_user="$WP_USER" \
+    # --admin_password="$WP_USER_PASSWORD" \
+    # --admin_email="$WP_USER_EMAIL"
+    
 
   chown -R www-data:www-data /var/www/html
 fi

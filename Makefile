@@ -43,8 +43,17 @@ volumes:
 	@mkdir -p $(WORDPRESS_VOL)
 	@echo "Volumes directories created!"
 
-up: volumes $(ENV_FILE)
+ssl:
+	bash srcs/tools/ssl.sh
+
+up:
+	docker compose -f srcs/docker-compose.yml up
+
+build: volumes ssl $(ENV_FILE)
 	docker compose -f srcs/docker-compose.yml up --build
+
+stop: 
+	docker compose -f srcs/docker-compose.yml stop
 
 down:
 	docker compose -f srcs/docker-compose.yml down
@@ -53,6 +62,6 @@ down:
 clean: down
 	docker system prune -af
 
-re: clean all
+re: clean build
 
-.PHONY: all up down clean re volumes
+.PHONY: all up build stop down clean re volumes

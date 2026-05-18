@@ -1,5 +1,5 @@
 " =========================
-" MARIADB / SQL
+" NGINX
 " =========================
 
 set nocompatible
@@ -9,11 +9,10 @@ filetype plugin indent on
 set number
 set relativenumber
 
-set nowrap
-set colorcolumn=100
-
 set autoindent
 set smartindent
+
+set nowrap
 
 set ignorecase
 set smartcase
@@ -21,22 +20,26 @@ set smartcase
 set incsearch
 set hlsearch
 
-set tabstop=2
-set shiftwidth=2
-set softtabstop=2
+set tabstop=4
+set shiftwidth=4
+set softtabstop=4
 set expandtab
 
-autocmd FileType sql setlocal commentstring=--\ %s
+set colorcolumn=80
 
 highlight ExtraWhitespace ctermbg=red guibg=red
 match ExtraWhitespace /\s\+$/
 
-" Mejor navegación en dumps gigantes
-set nowrap
-set lazyredraw
+" Logs más cómodos
+autocmd BufRead *.log setlocal nowrap
 
-" Mostrar tabs
+" Config nginx
+autocmd FileType nginx setlocal ts=4 sts=4 sw=4 expandtab
+
+" Navegación
+set ruler
+set showcmd
+
+" Mostrar tabs y trailing
 set list
 set listchars=tab:>-,trail:.
-
-colo pablo

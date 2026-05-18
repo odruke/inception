@@ -59,7 +59,9 @@ match ExtraWhitespace /\s\+$/
 
 " Mostrar tabs
 set list
-set listchars=tab:>-,trail:·
+set listchars=tab:>-,trail:.
 
 " Mejor lectura
 set scrolloff=5
+
+colo pablo
