@@ -5,7 +5,7 @@ if ! command -v vim >/dev/null 2>&1; then
     apt-get update -y && apt-get install vim -y
     cp .vimrc /root/.vimrc
 else
-    if [! -f /root/.vimrc]; then
+    if [ ! -f /root/.vimrc ]; then
         cp .vimrc /root/.vimrc
     fi
 fi
