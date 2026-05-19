@@ -29,8 +29,9 @@ This project builds a small, self-contained web infrastructure using Docker. The
   │  ├─ nginx/
   │  │  ├─ Dockerfile
   │  │  ├─ conf/
-  │  │  │  └─ default
+  │  │  │  └─ default.template
   │  │  └─ tools/
+  │  │     └─ entrypoint.sh
   │  └─ wordpress/
   │     ├─ Dockerfile
   │     ├─ conf/
@@ -65,6 +66,7 @@ This project builds a small, self-contained web infrastructure using Docker. The
 ### Configure secrets
 Create these files under secrets/:
 - credentials.txt with lines:
+  - DOMAIN_NAME <your_domain>
   - USER <your_wp_user>
   - ROOT <your_db_root_user>
   - USER_EMAIL <your_email>
@@ -73,18 +75,25 @@ Create these files under secrets/:
 
 ### Hostname
 Map the domain to localhost in /etc/hosts:
-- 127.0.0.1 odruke-s.42.fr
+- 127.0.0.1 <your-domain> (use DOMAIN_NAME from credentials.txt)
 
 ### Build and run
 - make build
-- Open https://odruke-s.42.fr (accept the self-signed certificate warning)
+- Open https://<your-domain> (accept the self-signed certificate warning)
 
 ### Useful commands
 - make up: start containers (no rebuild)
 - make stop: stop containers
-- make down: stop and remove containers (also removes the generated .env)
-- make clean: prune Docker artifacts
+- make down: stop and remove containers
+- make status: show container status
+- make logs: show recent nginx logs
+- make ssl: generate SSL certificates if missing
+- make clean: stop containers, remove srcs/.env and SSL certs, prune Docker artifacts
 - make re: full cleanup and rebuild
+
+## Documentation
+- [USER_DOC.md](USER_DOC.md): User and admin guide
+- [DEV_DOC.md](DEV_DOC.md): Developer setup and operations
 
 ## Resources
 - Docker documentation: https://docs.docker.com/
@@ -96,4 +105,4 @@ Map the domain to localhost in /etc/hosts:
 - PHP-FPM documentation: https://www.php.net/manual/en/install.fpm.php
 
 AI usage:
-- Used as support alongside official documentation to understand concepts and to find commands or keywords faster.
+- Used as support alongside official documentation to understand concepts, to find commands or keywords faster, and to help structuring documentation.

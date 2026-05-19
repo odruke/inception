@@ -22,7 +22,17 @@ if [ ! -d "$DATA_DIR/$DB_NAME" ]; then
   mysqld_safe --skip-networking --socket="$SOCKET" &
   TMP_PID=$!
 
+
+# wait for socket (timeout to avoid endless loop)
+max_attempts=60
+attempt=0
+
   until mysqladmin --socket="$SOCKET" ping --silent; do
+      attempt=$((attempt + 1))
+    if [ "$attempt" -ge "$max_attempts" ]; then
+      echo "Error: socket did not become ready after ${max_attempts}s."
+      exit 1
+    fi
     sleep 1
   done
 

@@ -12,8 +12,9 @@ COPY ssl/inception.key /etc/nginx/ssl/inception.key
 
 COPY tools/.vimrc /root/.vimrc
 
-COPY conf/default /etc/nginx/sites-available/default
 
-EXPOSE 80
+COPY conf/default.template /etc/nginx/templates/default.template
+COPY tools/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["/usr/local/bin/entrypoint.sh"]

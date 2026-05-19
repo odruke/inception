@@ -1,9 +1,16 @@
 #!/bin/bash
 set -e
 
-# wait for mariadb
+# wait for mariadb (timeout to avoid endless loop)
+max_attempts=60
+attempt=0
 
 until mysqladmin ping -h mariadb --silent; do
+  attempt=$((attempt + 1))
+  if [ "$attempt" -ge "$max_attempts" ]; then
+    echo "Error: MariaDB did not become ready after ${max_attempts}s."
+    exit 1
+  fi
   sleep 1
 done
 
@@ -32,14 +39,14 @@ if [ ! -f /var/www/html/wp-config.php ]; then
     --dbpass="$DB_PASSWORD" \
     --dbhost="mariadb"
 
-    # wp core install \
-    # --allow-root \
-    # --url="$DOMAIN_NAME" \
-    # --title="$WP_TITLE" \
-    # --admin_user="$WP_USER" \
-    # --admin_password="$WP_USER_PASSWORD" \
-    # --admin_email="$WP_USER_EMAIL"
-    
+    wp core install \
+    --allow-root \
+    --url="$DOMAIN_NAME" \
+    --title="$WP_TITLE" \
+    --admin_user="$WP_USER" \
+    --admin_password="$WP_USER_PASSWORD" \
+    --admin_email="$WP_USER_EMAIL"
+
 
   chown -R www-data:www-data /var/www/html
 fi

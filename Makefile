@@ -4,18 +4,19 @@ ENV_FILE= srcs/.env
 
 MARIADB_VOL=/home/odruke-s/data/mariadbvol
 WORDPRESS_VOL=/home/odruke-s/data/wordpressvol
-
+CREDENTIAL_KEY=srcs/requirements/nginx/ssl/inception.key
+CREDENTIAL_CRT=srcs/requirements/nginx/ssl/inception.crt
 
 all: up
 
 $(ENV_FILE):
 	@echo "Creating .env file..."
 
-	@echo "DOMAIN_NAME=odruke-s.42.fr" >> $(ENV_FILE)
+	@echo "DOMAIN_NAME=$$(awk '/^DOMAIN_NAME / {print $$2}' secrets/credentials.txt)" >> $(ENV_FILE)
 
 # -------- WORDPRESS VARIABLES ---------
 	@echo "# WORDPRESS" >> $(ENV_FILE)
-	
+
 	@echo "WP_TITLE=odrukePage" >> $(ENV_FILE)
 
 	@echo "WP_USER=$$(awk '/^USER / {print $$2}' secrets/credentials.txt)" >> $(ENV_FILE)
@@ -49,19 +50,25 @@ ssl:
 up:
 	docker compose -f srcs/docker-compose.yml up
 
-build: volumes ssl $(ENV_FILE)
+build: $(ENV_FILE) volumes ssl
 	docker compose -f srcs/docker-compose.yml up --build
 
-stop: 
+stop:
 	docker compose -f srcs/docker-compose.yml stop
 
 down:
 	docker compose -f srcs/docker-compose.yml down
-	rm $(ENV_FILE)
+
+status:
+	docker compose -f srcs/docker-compose.yml ps
+
+logs:
+	docker compose -f srcs/docker-compose.yml logs --tail=50 nginx
 
 clean: down
+	rm $(ENV_FILE) $(CREDENTIAL_CRT) $(CREDENTIAL_KEY)
 	docker system prune -af
 
 re: clean build
 
-.PHONY: all up build stop down clean re volumes
+.PHONY: all clean re up stop down volumes ssl status logs
