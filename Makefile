@@ -48,10 +48,10 @@ ssl:
 	bash srcs/tools/ssl.sh
 
 up:
-	docker compose -f srcs/docker-compose.yml up
+	docker compose -f srcs/docker-compose.yml up -d
 
 build: $(ENV_FILE) volumes ssl
-	docker compose -f srcs/docker-compose.yml up --build
+	docker compose -f srcs/docker-compose.yml up -d --build
 
 stop:
 	docker compose -f srcs/docker-compose.yml stop
